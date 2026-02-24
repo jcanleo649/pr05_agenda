@@ -8,9 +8,9 @@ const msg = document.querySelector("#msg");
 const btnBorrarTodo = document.querySelector("#btnBorrarTodo");
 const secContactos = document.querySelector("#secContactos");
 
-/* Creamos el array */
+// Creamos el array principal
 let agenda = [];
-/* Creo un array temporal */
+// Creo un array temporal
 const telefonosNuevos = [];
 
 const CLAVE_LS_AGENDA =  "agenda";
@@ -28,6 +28,7 @@ function cargarContactos() {
     return [];
   }
 }
+
 function guardarContactos() {
   localStorage.setItem(CLAVE_LS_AGENDA, JSON.stringify(agenda));
 }
@@ -39,6 +40,7 @@ function crearId() {
 function mostrarMensaje(texto) {
   msg.textContent = texto;
 }
+
 function renderTelefonosNuevos() {
   ulTelefonos.innerHTML = "";
   for (const valorStr of telefonosNuevos) {
@@ -46,7 +48,8 @@ function renderTelefonosNuevos() {
     li.textContent = valorStr;
     ulTelefonos.appendChild(li);
   }
-  }
+}
+
 function renderContactos() {
   secContactos.innerHTML = "";
   if (agenda.length === 0) {
@@ -78,6 +81,7 @@ function renderContactos() {
     secContactos.appendChild(card);
   }
 }
+// Pintamos todo
 function render() {
   renderTelefonosNuevos();
   renderContactos();
@@ -104,8 +108,10 @@ function addTel() {
       inpTelNumero.focus();
 
       mostrarMensaje("");
+      // Llamamos a render
       render();
 }
+
 function guardarContacto(e) {
   e.preventDefault();
 
@@ -119,9 +125,10 @@ function guardarContacto(e) {
     return;
   }
   if (telefonosNuevos.length === 0) {
-    alert("Añade al menos 1 teléfono.");
+    mostrarMensaje("Añade al menos 1 teléfono.");
     return;
   }
+  // Creamos un contacto
   const contacto = {
     id: crearId(),
     nombre: inpNombre.value.trim(),
@@ -131,37 +138,53 @@ function guardarContacto(e) {
   agenda.push(contacto);
   guardarContactos();
 
-  // reset de formulario + reset del temporal
+  // Reset de formulario
   formContacto.reset();
   telefonosNuevos.length = 0;
-
+  
+  // Guardamos el contacto
   mostrarMensaje("Contacto guardado.");
+  // Llamamos a render
   render();
 }
 
 function borrarContacto(id) {
+  // Borramos el contacto
   agenda = agenda.filter(c => c.id !== id);
   guardarContactos();
+  // Llamamos a render
+  render();
+}
+
+function limpiarFormulario() {
+  // Limpiamos el formulario
+  telefonosNuevos.length = 0;
+  mostrarMensaje("");
+  // Llamamos a render
   render();
 }
 
 function borrarTodo() {
-  // TODO: Borrar el array de agenda
-  if (!confirm("¿Seguro que quieres borrar toda la agenda?")) return;
+  // Preguntamos si quiere borrar toda la agenda
+  if (!confirm("¿Seguro que quieres borrar toda la agenda?")) 
+  return;
+  // Borramos el array de agenda
   agenda.length = 0;
   guardarContactos();
-  // llamamos a render
+  // Llamamos a render
   render();
   }
 
-/* Inicializamos */
 function init() {
-    agenda = cargarContactos();
-    /* Registrar los eventos de los botones */
-    btnAddTel.addEventListener("click", addTel);
-    btnBorrarTodo.addEventListener("click", borrarTodo);
-    formContacto.addEventListener("submit", guardarContacto);
-    
-    render();
+  agenda = cargarContactos();
+  // Registrar los eventos de los botones
+  btnAddTel.addEventListener("click", addTel);
+  btnBorrarTodo.addEventListener("click", borrarTodo);
+  formContacto.addEventListener("submit", guardarContacto);
+  formContacto.addEventListener("reset", limpiarFormulario);
+  // Llamamos a render
+  render();
 }
+
+// Inicializamos
 init();
